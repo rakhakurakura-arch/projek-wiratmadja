@@ -1,0 +1,97 @@
+// generator & datasource configuration
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("CONTRIBUTOR") // "ADMIN" | "CONTRIBUTOR"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditLogs AuditLog[]
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?   // Icon identifier
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String
+  price       Int      // in IDR (Rupiah)
+  stock       Int      @default(0)
+  imageUrl    String
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  variants   ProductVariant[]
+  orderItems OrderItem[]
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String  // e.g. "Ukuran" or "Warna"
+  value     String  // e.g. "500gr", "1 Liter", "Hijau Botol"
+  price     Int?    // Optional override price
+  stock     Int     @default(10)
+}
+
+model Order {
+  id            String   @id @default(uuid())
+  customerName  String
+  customerPhone String
+  address       String
+  notes         String?
+  totalAmount   Int
+  status        String   @default("PENDING") // "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED"
+  paymentMethod String   @default("WhatsApp Direct")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  productName String
+  variantInfo String?  // e.g. "Ukuran: 1kg"
+  price       Int
+  quantity    Int
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // e.g. "CREATE_PRODUCT", "UPDATE_PRODUCT", "DELETE_PRODUCT"
+  details   String   // Human readable action summary
+  createdAt DateTime @default(now())
+}
