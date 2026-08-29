@@ -1,4 +1,12 @@
+# dependencies & build
 node_modules
 .next
-.env
 *.log
+
+# environment variables
+.env
+.env*.local
+
+# sqlite database
+prisma/dev.db
+prisma/dev.db-journal

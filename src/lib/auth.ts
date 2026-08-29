@@ -1,9 +1,13 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'wiratmadja_family_secret_key_2026_super_secure'
-);
+function getSecretKey(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is missing. Please set JWT_SECRET in your environment or .env file.');
+  }
+  return new TextEncoder().encode(secret);
+}
 
 export interface UserSession {
   id: string;
@@ -17,7 +21,7 @@ export async function createSession(user: UserSession) {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(SECRET_KEY);
+    .sign(getSecretKey());
 
   const cookieStore = await cookies();
   cookieStore.set('wiratmadja_session', token, {
@@ -37,7 +41,7 @@ export async function getSession(): Promise<UserSession | null> {
     const token = cookieStore.get('wiratmadja_session')?.value;
     if (!token) return null;
 
-    const { payload } = await jwtVerify(token, SECRET_KEY);
+    const { payload } = await jwtVerify(token, getSecretKey());
     return payload as unknown as UserSession;
   } catch {
     return null;

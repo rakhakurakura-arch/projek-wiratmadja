@@ -61,9 +61,9 @@ export default function CartPage() {
           totalAmount: totalPrice,
           items: items.map((item) => ({
             productId: item.productId,
+            variantId: item.variantId || null,
             productName: item.title,
             variantInfo: item.variantValue ? `${item.variantName || 'Varian'}: ${item.variantValue}` : null,
-            price: item.price,
             quantity: item.quantity,
           })),
         }),

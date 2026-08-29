@@ -3,11 +3,22 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 
 export async function GET() {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        category: {
+          select: { name: true, slug: true },
+        },
+        variants: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return NextResponse.json(products);
+  } catch (error) {
+    console.error('Error fetching internal products:', error);
+    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
   }
-  return NextResponse.json({ user: session });
 }
 
 export async function POST(request: Request) {

@@ -48,17 +48,19 @@ export default function CategoryManager({ initialCategories }: { initialCategori
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Hapus kategori "${name}"? Semua produk terkait akan disesuaikan.`)) return;
+    if (!confirm(`Apakah Anda yakin ingin menghapus kategori "${name}"?`)) return;
 
     try {
       const res = await fetch(`/api/internal/categories/${id}`, { method: 'DELETE' });
       if (res.ok) {
         router.refresh();
       } else {
-        alert('Gagal menghapus kategori.');
+        const data = await res.json();
+        alert(data.error || 'Gagal menghapus kategori.');
       }
     } catch (err) {
       console.error(err);
+      alert('Terjadi kesalahan jaringan.');
     }
   };
 

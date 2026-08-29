@@ -20,6 +20,14 @@ export async function DELETE(
       return NextResponse.json({ error: 'Kategori tidak ditemukan' }, { status: 404 });
     }
 
+    const productCount = await prisma.product.count({ where: { categoryId } });
+    if (productCount > 0) {
+      return NextResponse.json(
+        { error: 'Tidak bisa menghapus kategori yang masih memiliki produk, pindahkan produk terlebih dahulu' },
+        { status: 400 }
+      );
+    }
+
     await prisma.category.delete({ where: { id: categoryId } });
 
     await prisma.auditLog.create({
