@@ -4,13 +4,37 @@ import { redirect } from 'next/navigation';
 import InternalSidebar from '@/components/InternalSidebar';
 import { ShoppingCart, Phone, MapPin, Calendar, Clock } from 'lucide-react';
 
+interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  productName: string;
+  variantInfo?: string | null;
+  price: number;
+  quantity: number;
+}
+
+interface OrderWithItems {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  address: string;
+  notes?: string | null;
+  totalAmount: number;
+  status: string;
+  paymentMethod: string;
+  createdAt: Date;
+  updatedAt: Date;
+  items: OrderItem[];
+}
+
 export default async function InternalOrdersPage() {
   const session = await getSession();
   if (!session) {
     redirect('/internal/login');
   }
 
-  const orders = await prisma.order.findMany({
+  const orders: OrderWithItems[] = await prisma.order.findMany({
     include: {
       items: true,
     },
