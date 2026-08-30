@@ -1,83 +1,51 @@
-﻿# Panduan Deploy Proyek WIRATMADJA ke Vercel
+# Panduan Deploy Proyek WIRATMADJA ke Vercel
 
-Panduan ini berisi langkah-langkah singkat dan praktis untuk men-deploy aplikasi katalog **WIRATMADJA** ke Vercel dengan database SQLite berbasis cloud (**Turso**).
-
----
-
-## 1. Membuat Database Turso & Mendapatkan Kredensial
-
-Platform serverless seperti Vercel menggunakan *ephemeral filesystem* (penyimpanan sementara). Oleh karena itu, kita menggunakan **Turso** (SQLite cloud yang kompatibel penuh dengan Prisma).
-
-### Cara A: Melalui Dashboard Web Turso
-1. Buat akun atau login di [Turso Console (turso.tech)](https://turso.tech/).
-2. Buat database baru (misal diberi nama: wiratmadja-db).
-3. Dapatkan **Database URL** (berawalan libsql://...).
-4. Buat **Auth Token** baru di bagian *Tokens* / *Security* pada dashboard database tersebut.
-
-### Cara B: Melalui Turso CLI
-`ash
-# 1. Install Turso CLI & login
-npm i -g turso
-turso auth login
-
-# 2. Buat database
-turso db create wiratmadja-db
-
-# 3. Dapatkan Database URL
-turso db show wiratmadja-db --url
-
-# 4. Generate Auth Token
-turso db tokens create wiratmadja-db
-`
+Panduan ini berisi langkah-langkah men-deploy aplikasi katalog **WIRATMADJA** ke **Vercel**, menggunakan database cloud **Turso** yang sudah disiapkan sebelumnya.
 
 ---
 
-## 2. Pengaturan Environment Variables di Vercel
+## 1. Database Turso (Sudah Siap)
 
-Saat menambahkan proyek di **Dashboard Vercel** (*Project Settings > Environment Variables*), isi variabel-variabel berikut:
+Database Turso (`wiratmadja-db`) dan seluruh tabelnya sudah dibuat dan diisi data awal. Yang diperlukan hanya kredensial berikut untuk dipasang di Vercel:
 
-| Nama Variabel | Penjelasan | Contoh Nilai |
-|---|---|---|
-| TURSO_DATABASE_URL | URL database Turso | libsql://wiratmadja-db-username.turso.io |
-| TURSO_AUTH_TOKEN | Token otentikasi database Turso | eyJhbGciOi... |
-| JWT_SECRET | Secret key untuk enkripsi session token | String acak baru & aman (berbeda dari local dev) |
-| NEXT_PUBLIC_WHATSAPP_NUMBER | Nomor WhatsApp CS / Admin Toko | 6281234567890 (format 62 tanpa + / spasi) |
-
-> ⚠️ **PERHATIAN KEAMANAN (JWT_SECRET):**
-> Pastikan JWT_SECRET di Vercel diisi dengan string acak baru yang kuat (misal generated via openssl rand -base64 32). Jangan gunakan nilai default yang ada di .env lokal!
+- **Database URL** (gunakan skema `https://`, BUKAN `libsql://`, karena aplikasi ini menggunakan client HTTP-only): `https://wiratmadja-db-rakhakurakura-arch.aws-ap-northeast-1.turso.io`
+- **Auth Token**: buat token baru khusus production lewat dashboard Turso (app.turso.tech > database > Create Token), demi keamanan sebaiknya terpisah dari token yang dipakai untuk keperluan lokal.
 
 ---
 
-## 3. Migrasi Skema & Seeding Database Turso Pertama Kali
+## 2. Import Project ke Vercel
 
-Sebelum aplikasi di-deploy / diakses di Vercel, jalankan perintah berikut dari komputer lokal (atau terminal proyek) yang sudah membaca TURSO_DATABASE_URL dan TURSO_AUTH_TOKEN Turso production:
-
-### Langkah A: Push Schema ke Turso
-`ash
-# Set environment variable Turso sementara (PowerShell Windows)
-=" libsql://wiratmadja-db-username.turso.io\
-=\your_turso_auth_token\
-
-# Push skema tabel Prisma ke database Turso cloud
-npx prisma db push
-`
-*(Atau di Bash/Linux/Mac: TURSO_DATABASE_URL=\...\ TURSO_AUTH_TOKEN=\...\ npx prisma db push)*
-
-### Langkah B: Jalankan Seed Data Awal
-`ash
-# Populasi kategori, produk awal, dan akun admin/kontributor ke Turso cloud
-npx prisma db seed
-`
+1. Buka [vercel.com](https://vercel.com), login (bisa langsung pakai akun GitHub).
+2. Klik **"Add New" > "Project"**.
+3. Pilih **"Import Git Repository"**, cari dan pilih repo `projek-wiratmadja`.
+4. Vercel akan otomatis mendeteksi ini sebagai proyek Next.js. Biarkan pengaturan build default (tidak perlu diubah).
 
 ---
 
-## 4. ⚠️ PERINGATAN PENTING: Penggantian Password Akun Default
+## 3. Pengaturan Environment Variables di Vercel
 
-> 🚨 **KEAMANAN KRITIS:**
-> Kredensial default bawaan seed (dmin123 untuk Admin & keluarga123 untuk Kontributor) tersimpan secara publik di kode sumber GitHub (prisma/seed.ts).
-> 
-> **Setelah deployment pertama selesai:**
-> 1. Login ke aplikasi yang sudah live di Vercel (/internal/login).
-> 2. Masuk ke halaman **Kelola User** (/internal/users).
-> 3. Segera ubah password akun dmin@wiratmadja.id dan keluarga@wiratmadja.id dengan password baru yang kuat & rahasia.
+Sebelum klik Deploy, buka bagian **"Environment Variables"** di halaman import, isi:
 
+| Nama Variabel | Nilai |
+|---|---|
+| TURSO_DATABASE_URL | https://wiratmadja-db-rakhakurakura-arch.aws-ap-northeast-1.turso.io |
+| TURSO_AUTH_TOKEN | (token production dari langkah 1) |
+| JWT_SECRET | String acak baru yang kuat (JANGAN sama dengan .env lokal) |
+| NEXT_PUBLIC_WHATSAPP_NUMBER | Nomor WhatsApp toko, format 62 tanpa spasi/tanda + |
+
+---
+
+## 4. Deploy
+
+Klik tombol **"Deploy"**. Tunggu proses build selesai (biasanya 1-2 menit). Setelah selesai, Vercel akan memberikan URL live berformat `https://nama-proyek.vercel.app`.
+
+---
+
+## 5. 🚨 WAJIB: Ganti Password Default
+
+> Akun admin default (`admin@wiratmadja.id` / `admin123`) dan kontributor (`keluarga@wiratmadja.id` / `keluarga123`) ada di kode sumber publik GitHub (`prisma/seed.ts`).
+>
+> Segera setelah deploy pertama:
+> 1. Buka URL live Vercel kamu, akses `/internal/login`.
+> 2. Login, masuk ke menu **Kelola User** (`/internal/users`).
+> 3. Ganti password kedua akun tersebut dengan password baru yang kuat & rahasia.
