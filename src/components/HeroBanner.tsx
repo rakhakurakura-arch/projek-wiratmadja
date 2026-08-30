@@ -98,7 +98,7 @@ export default function HeroBanner() {
             </a>
 
             <a
-              href="https://wa.me/6281234567890?text=Halo%20Wiratmadja,%20saya%20ingin%20konsultasi%20pesanan%20katalog"
+              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '6281234567890'}?text=Halo%20Wiratmadja,%20saya%20ingin%20konsultasi%20pesanan%20katalog`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border border-sage-400/50 hover:bg-forest-800/60 text-sage-100 px-5 py-3.5 rounded-xl font-medium text-sm transition-all backdrop-blur-sm"

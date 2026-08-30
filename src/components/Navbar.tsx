@@ -47,13 +47,13 @@ export default function Navbar({ categories = [] }: { categories?: Category[] })
             </span>
           </div>
           <a
-            href="https://wa.me/6281234567890?text=Halo%20Wiratmadja,%20saya%20ingin%20bertanya%20mengenai%20katalog%20produk"
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '6281234567890'}?text=Halo%20Wiratmadja,%20saya%20ingin%20bertanya%20mengenai%20katalog%20produk`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 hover:text-white transition-colors"
           >
             <Phone className="w-3.5 h-3.5 text-sage-300" />
-            <span>Customer Service: +62 812-3456-7890</span>
+            <span>Customer Service: +{process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '6281234567890'}</span>
           </a>
         </div>
       </div>

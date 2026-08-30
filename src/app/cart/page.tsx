@@ -87,7 +87,8 @@ export default function CartPage() {
       message += `Mohon info rekening pembayaran dan konfirmasi ketersediaan pengiriman. Terima kasih.`;
 
       const encoded = encodeURIComponent(message);
-      window.open(`https://wa.me/6281234567890?text=${encoded}`, '_blank');
+      const waNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '6281234567890';
+      window.open(`https://wa.me/${waNum}?text=${encoded}`, '_blank');
       clearCart();
     } catch (err) {
       console.error('Failed creating order:', err);

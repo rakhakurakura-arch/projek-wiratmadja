@@ -88,7 +88,7 @@ export default function Footer() {
             <h4 className="font-serif text-base font-bold text-white tracking-wide">Hubungi Kami</h4>
             <div className="space-y-2.5 text-xs">
               <a
-                href="https://wa.me/6281234567890?text=Halo%20Wiratmadja,%20saya%20ingin%20memesan%20produk"
+                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '6281234567890'}?text=Halo%20Wiratmadja,%20saya%20ingin%20memesan%20produk`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 p-2.5 bg-forest-900/80 hover:bg-forest-800 border border-forest-800 rounded-xl text-sage-100 hover:text-white transition-all group"
@@ -96,7 +96,7 @@ export default function Footer() {
                 <Phone className="w-4 h-4 text-sage-300 group-hover:scale-110 transition-transform" />
                 <div>
                   <span className="font-bold block text-xs">WhatsApp Direct Admin</span>
-                  <span className="text-[11px] text-sage-300">+62 812-3456-7890</span>
+                  <span className="text-[11px] text-sage-300">+{process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '6281234567890'}</span>
                 </div>
                 <ArrowUpRight className="w-3.5 h-3.5 ml-auto text-sage-400" />
               </a>

@@ -71,7 +71,8 @@ export default function ProductCard({ product, onOpenVariantModal }: ProductCard
     } else {
       const message = `Halo Wiratmadja, saya berminat membeli produk:\n\n*${product.title}*\nHarga: ${formatRupiah(product.price)}\n\nApakah stok masih tersedia?`;
       const encodedMsg = encodeURIComponent(message);
-      window.open(`https://wa.me/6281234567890?text=${encodedMsg}`, '_blank');
+      const waNum = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '6281234567890';
+      window.open(`https://wa.me/${waNum}?text=${encodedMsg}`, '_blank');
     }
   };
 
