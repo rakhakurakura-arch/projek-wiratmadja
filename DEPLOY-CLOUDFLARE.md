@@ -20,9 +20,9 @@ npx wrangler login
 Untuk menjaga keamanan kredensial sensitif, gunakan `wrangler secret put` alih-alih menyimpannya secara plaintext di file `wrangler.jsonc`:
 
 ```bash
-# 1. Secret URL Database Turso
+# 1. Secret URL Database Turso (Gunakan awalan https:// bukan libsql:// untuk HTTP client Cloudflare Workers)
 npx wrangler secret put TURSO_DATABASE_URL
-# Masukkan nilai: libsql://wiratmadja-db-username.turso.io
+# Masukkan nilai: https://wiratmadja-db-username.turso.io
 
 # 2. Secret Auth Token Turso
 npx wrangler secret put TURSO_AUTH_TOKEN
